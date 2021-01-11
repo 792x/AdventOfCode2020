@@ -9,18 +9,26 @@ pub fn run() {
     let lines = read_puzzle_input();
     let ruleset = parse_rules(lines);
     println!("Ruleset: {:?}", &ruleset);
-    get_potential_bag_count(&ruleset);
+    println!("Potential bag count: {}", get_potential_bag_count(&ruleset));
+    println!("Contains bag count: {}", get_num_bags_inside(&ruleset, "shiny gold"));
 }
 
-fn get_potential_bag_count(ruleset: &HashMap<String, HashMap<String, i32>>) {
-    let mut count = 0i32;
-    for (bag_type, can_contain) in ruleset {
-        if can_contain_shiny_gold_bag(&ruleset, &can_contain) {
-            println!("Valid bag found: {}", bag_type);
-            count += 1;
-        }
-    }
-    println!("Final count: {}", count);
+fn get_num_bags_inside(ruleset: &HashMap<String, HashMap<String, i32>>, bag_type: &str) -> i32 {
+    let contains = ruleset.get(bag_type).unwrap();
+    return if contains.len() == 0 {
+        0
+    } else {
+        contains.into_iter()
+            .fold(0, |acc, (key, value)|
+                acc + value + (value * get_num_bags_inside(&ruleset, key)))
+    };
+}
+
+fn get_potential_bag_count(ruleset: &HashMap<String, HashMap<String, i32>>) -> i32 {
+    ruleset.into_iter()
+        .filter(|(key, value)|
+            can_contain_shiny_gold_bag(&ruleset, &value))
+        .count() as i32
 }
 
 fn can_contain_shiny_gold_bag(ruleset: &HashMap<String, HashMap<String, i32>>, can_contain: &HashMap<String, i32>) -> bool {
@@ -59,7 +67,7 @@ fn parse_rules(lines: Lines<BufReader<File>>) -> HashMap<String, HashMap<String,
 
 
 fn read_puzzle_input() -> Lines<BufReader<File>> {
-    let path = Path::new("./src/aoc7/test2.txt");
+    let path = Path::new("./src/aoc7/input.txt");
     let display = path.display();
     let file = match File::open(&path) {
         Err(why) => panic!("Couldn't open {}: {}", display, Error::to_string(&why)),
