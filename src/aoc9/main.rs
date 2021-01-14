@@ -11,8 +11,6 @@ pub fn run() {
     println!("Bad number: {}", &bad_number);
     let set = find_sum_set(&numbers, bad_number);
     println!("Contiguous set min and max sum: {}", set);
-
-
 }
 
 fn find_sum_set(numbers: &Vec<i64>, bad_number: i64) -> i64 {
