@@ -1,2 +1,2 @@
 # AdventOfCode2020
-Rust
+Learning rust
