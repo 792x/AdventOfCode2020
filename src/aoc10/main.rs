@@ -8,32 +8,64 @@ use std::path::Path;
 pub fn run() {
     let lines = read_puzzle_input();
     let mut numbers = parse_numbers(lines);
-    get_jolt_differences(&mut numbers);
-
-
-}
-
-fn get_jolt_differences(numbers: &mut Vec<i32>) {
     numbers.sort_unstable();
-    let mut prev = numbers[0];
-    let mut num_1_diff = 1i32;
-    let mut num_3_diff = 1i32;
-    for num in numbers {
-        match *num - prev {
-            1 => num_1_diff += 1,
-            3 => num_3_diff += 1,
-            _ => ()
+    numbers.insert(0, 0);
+    numbers.push(numbers.last().unwrap() + 3);
+    println!("{:?}", &numbers);
+    let (one_diffs, three_diffs) = get_jolt_differences(&mut numbers);
+    println!("1 diffs: {}, 3 diffs: {}, mult: {}", one_diffs, three_diffs, one_diffs * three_diffs);
+    let num_arrangements = get_num_distinct_arrangements(&mut numbers);
+    println!("Number of arrangements: {}", num_arrangements);
+}
+
+fn get_num_distinct_arrangements(numbers: &mut Vec<i64>) -> i64 {
+    let mut slices = Vec::new();
+    let mut current_slice = Vec::new();
+
+    // Credit to https://github.com/tudorpavel for elegant solution
+    for window in numbers.windows(2) {
+        match window[1] - window[0] {
+            1 => current_slice.push(window[0]),
+            3 => {
+                current_slice.push(window[0]);
+                slices.push(current_slice);
+                current_slice = Vec::new();
+            }
+            _ => (),
         }
-        prev = *num;
     }
-    println!("1 diffs: {}, 3 diffs: {}, mult: {}", num_1_diff, num_3_diff, num_1_diff * num_3_diff);
+
+    slices.iter()
+        .map(|slice| match slice.len() {
+            1 => 1,
+            2 => 1,
+            3 => 2,
+            4 => 4,
+            5 => 7,
+            _ => panic!("panic"),
+        })
+        .product()
 }
 
 
-fn parse_numbers(lines: Lines<BufReader<File>>) -> Vec<i32> {
-    let mut vec: Vec<i32> = Vec::new();
+fn get_jolt_differences(numbers: &mut Vec<i64>) -> (i64, i64) {
+    let mut one_diffs = 0i64;
+    let mut three_diffs = 0i64;
+    for window in numbers.windows(2) {
+        match window[1] - window[0] {
+            1 => one_diffs += 1,
+            3 => three_diffs += 1,
+            _ => (),
+        }
+    }
+    return (one_diffs, three_diffs);
+}
+
+
+fn parse_numbers(lines: Lines<BufReader<File>>) -> Vec<i64> {
+    let mut vec: Vec<i64> = Vec::new();
     for line in lines {
-        vec.push(line.unwrap().parse::<i32>().unwrap())
+        vec.push(line.unwrap().parse::<i64>().unwrap())
     }
     vec
 }
