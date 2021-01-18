@@ -1,5 +1,5 @@
-mod aoc10;
+mod aoc11;
 
 fn main() {
-    aoc10::main::run();
+    aoc11::main::run();
 }
