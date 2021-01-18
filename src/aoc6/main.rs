@@ -11,7 +11,7 @@ pub fn run() {
     println!("Total unanimous answers: {}", num_unanimous_answers);
 }
 
-fn get_num_unanimous_answers(file: &String) -> u32{
+fn get_num_unanimous_answers(file: &String) -> u32 {
     let groups = file.split("\n\n");
     let mut cumsum = 0u32;
     for group in groups {
